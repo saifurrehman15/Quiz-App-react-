@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html::-webkit-scrollbar {
+  display: none;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(22, 22, 22) !important;
+}
+.cards {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  transition: transform 0.3s;
+}
+
+.hero-section {
+  color: #fff;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}
+.svg {
+  transform: rotate(-180deg);
+  height: 240px;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}
+/* .sect {
+  margin-top: 50px;
+} */
+/* .cards{
+  min-width: 80% !important; 
+  padding: 20px;
+  height: 320px;
+ } */
+.divider {
+  border: 1px solid rgba(128, 128, 128, 0.226);
+}
+.circle {
+  border: 2px solid rgb(199, 198, 198);
+  border-radius: 50%;
+}
+.layout {
+  background-color: rgb(22, 22, 22) !important;
+}
+@media only screen and (max-width: 768px) {
+  .hero-section {
+    text-align: center;
+  }
+  .svg {
+    height: 120px;
+    width: 100%;
+  }
+  .sect {
+    margin-top: 0;
+  }
+  .image > img {
+    height: 150px;
+    width: 100%;
+  }
+  .small-device {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+/* @media only screen and (max-width: 600px) {
+  .small-device {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+} */
