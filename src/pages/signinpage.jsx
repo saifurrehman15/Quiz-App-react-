@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { GoogleOutlined } from "@ant-design/icons";
 import ParticleCanvas from "../component/particles";
-import image from "../src/assets/image 1.png";
+import image from "../assets/image 1.png";
 function SignInForm() {
   const navigate = useNavigate();
 
