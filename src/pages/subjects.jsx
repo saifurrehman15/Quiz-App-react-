@@ -226,7 +226,7 @@ function SubjectSelect() {
   });
 
   return (
-    <div className="h-screen ">
+    <div className="">
 
       <h1 className="text-yellow-300">Select Quiz</h1>
       <Collapse

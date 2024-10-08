@@ -40,7 +40,7 @@ function QuizPage() {
       setScore(updatedScore); // Update state asynchronously
     }
     setOptionsSelected(false);
-  
+
     // Move to the next question or show results
     if (count < data.length - 1) {
       setCount(count + 1);
@@ -55,16 +55,17 @@ function QuizPage() {
         subject: quizSelected,
         scores: (updatedScore * 100) / totalQuestions,
       };
-  
+
       // Retrieve existing results from sessionStorage
-      const existingResults = JSON.parse(sessionStorage.getItem("resultsData")) || [];
-  
+      const existingResults =
+        JSON.parse(sessionStorage.getItem("resultsData")) || [];
+
       // Append the new result to the array
       const updatedResults = [...existingResults, resultObj];
-  
+
       // Store the updated array in sessionStorage
       sessionStorage.setItem("resultsData", JSON.stringify(updatedResults));
-  
+
       // Push the final score to Firestore
       setRes(true);
       const userDocRef = doc(db, "users", id);
@@ -72,14 +73,14 @@ function QuizPage() {
         result: arrayUnion(resultObj),
       });
       setRes(false);
-  
+
       // Redirect to the result page
       window.location.replace(
         `/quickresult/${quizSelected}/${courseName}/${data.length}/2/${updatedScore}/${id}`
       );
     }
   };
-  
+
   useEffect(() => {
     if (count === data.length - 1) {
       setBtnText("Submit");
@@ -114,7 +115,7 @@ function QuizPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen pt-20 text-gray-800">
+    <div className="flex flex-col items-center justify-center  text-gray-800">
       {loading ? (
         <p className="text-xl">Loading...</p>
       ) : (
@@ -122,18 +123,22 @@ function QuizPage() {
           <h2 className="text-2xl font-bold mb-4">{`Question ${
             count + 1
           }/${totalQuestions}`}</h2>
-          <p className="mb-4 text-lg">{data[count]?.quiz.question}</p>
+          <div className="flex justify-between">
+            <p className="mb-4 text-lg">{data[count]?.quiz.question}</p>
+            {optColor === "bg-red-400" && (<button className="bg-blue-500 px-4 h-8 text-white">Answer</button>)}
+          </div>
           <div className="space-y-2">
             {data[count]?.quiz.options.map((elem, ind) => (
               <label
                 htmlFor={`option${ind}`}
-                className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg ${
+                className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-gray-800 ${
                   `option${ind}` === optTrigger ? optColor : ""
                 }`}
                 key={ind}
               >
                 <input
                   type="radio"
+                  hidden
                   name="options"
                   id={`option${ind}`}
                   disabled={disabledOpt}
@@ -152,7 +157,7 @@ function QuizPage() {
             ))}
           </div>
           <button
-            className={`mt-4 p-2 px-4 rounded-md ${
+            className={`mt-4 p-2 px-8 float-end rounded-md ${
               optionsSelected
                 ? "bg-green-500 hover:bg-green-600"
                 : "bg-gray-300"

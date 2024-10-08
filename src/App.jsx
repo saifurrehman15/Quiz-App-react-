@@ -6,6 +6,7 @@ import { userContext } from "./context/userContext";
 import { Link } from "react-router-dom";
 import { message } from "antd";
 import "aos/dist/aos.css";
+
 function App() {
   const arr = [
     {
@@ -43,19 +44,19 @@ function App() {
   const { displayName, id } = users;
   return (
     <>
-      <div className="text-white sm:ms-10">
+      <div className="text-white">
         <h1 className="text-2xl sm:text-3xl mb-2 font-bold">Hi, {displayName}</h1>
         <p>
           Welcome to the quiz portal. Select your course below to take a quiz.
         </p>
       </div>
-      <div className="mt-4 flex flex-wrap gap-[50px] justify-center">
+      <div className="mt-4 flex flex-wrap gap-[55px] ">
         {arr.map((elem, ind) => (
           <div
-            className=" h-[280px] w-[300px] mb-2 p-5 bg-white shadow-lg border border-gray-200 rounded-2xl transition-all transform hover:scale-105 hover:rotate-1  hover:shadow-lg flex flex-col justify-between items-center text-center"
+            className=" h-[280px] w-[300px] mb-2 p-5 cards shadow-lg  rounded-2xl transition-all transform hover:scale-105 hover:rotate-1  hover:shadow-lg flex flex-col justify-between items-center text-center"
             key={ind}
           >
-            <h3 className="text-2xl flex flex-col items-center gap-2 font-bold text-gray-700 ">
+            <h3 className="text-2xl flex flex-col items-center gap-2 font-bold">
               <img
                 src={elem.image}
                 alt=""
@@ -65,7 +66,7 @@ function App() {
               />
               {elem.course}
             </h3>
-            <h6>{elem.totalSubjects} subjects</h6>
+            <h4 className="font-bold">{elem.totalSubjects} Subjects</h4>
             <Link
               to={elem.active ? `/subject/${elem.course}/${id}` : ""}
               onClick={() => {

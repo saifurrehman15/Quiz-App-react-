@@ -5,6 +5,7 @@ import {
   UserOutlined,
   BarChartOutlined,
   LogoutOutlined,
+  SettingFilled,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme, Drawer } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -20,6 +21,14 @@ const LayoutFunc = () => {
   const { url: image, id } = userDetails || {};
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const manage =
+    id === "OVvVAmV8PsODK1W0tluYAVmRWqG3"
+      ? {
+          key: "4",
+          icon: <SettingFilled />,
+          label: <Link to={`/result/${id}`}>Manage Quiz-App</Link>,
+        }
+      : {};
 
   const showDrawer = () => {
     setOpen(true);
@@ -69,6 +78,7 @@ const LayoutFunc = () => {
           ]}
         />
       </Drawer>
+
       {window.innerWidth >= 430 && (
         <Sider
           trigger={null}
@@ -83,7 +93,7 @@ const LayoutFunc = () => {
           <div className="demo-logo-vertical" />
           <Menu
             theme="dark"
-            style={{ backgroundColor: "rgb(22, 22, 22)" }}
+            style={{ backgroundColor: "rgb(22, 22, 22)", marginTop: "15px" }}
             mode="inline"
             defaultSelectedKeys={["1"]}
             items={[
@@ -97,10 +107,11 @@ const LayoutFunc = () => {
                 icon: <BarChartOutlined />,
                 label: <Link to={`/result/${id}`}>Result</Link>,
               },
+              manage,
               {
                 key: "3",
                 icon: <LogoutOutlined />,
-                label: <button onClick={handleSignout}>Logout</button>,
+                label: <button onClick={() => handleSignout()}>Logout</button>,
               },
             ]}
           />

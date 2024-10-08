@@ -14,6 +14,20 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   transition: transform 0.3s;
 }
+.cards {
+  background-color: #ffffff; /* White background */
+  color: #333333; /* Dark text for readability */
+  border: 1px solid #e0e0e0; /* Light gray border */
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cards:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
 
 .hero-section {
   color: #fff;

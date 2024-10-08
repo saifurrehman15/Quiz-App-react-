@@ -9,11 +9,11 @@ function QuickResult() {
     percentage >= 70 ? "Congratulations, you passed" : "Better Luck next time!";
   const borderColor = percentage >= 70 ? "text-green-500" : "text-red-500";
   return (
-    <div className="pt-20 text-white">
-      <h1>{nameQuiz}</h1>
+    <div className="text-white">
+      <h1 className="font-bold text-2xl">{nameQuiz}</h1>
       <div className="bg-white text-gray-900  sm:w-1/2 p-3 px-5 rounded text-center mx-auto sm:mt-10">
         <div className="mb-2">
-          <h3 className={borderColor}>{remarks}</h3>
+          <h3 className={`${borderColor} text-2xl font-bold`}>{remarks}</h3>
         </div>
         <div className="relative mx-auto mt-3 mb-3  w-20 h-20 circle">
           {/* Circle to show percentage in border */}
@@ -32,15 +32,17 @@ function QuickResult() {
 
           {/* Inner circle with percentage text */}
           <div className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-transparent">
-            <span className="text-lg font-bold">{percentage.toFixed(0)}%</span>
+            <span className={`text-lg font-bold ${borderColor }`}>
+              {percentage.toFixed(0)}%
+            </span>
           </div>
         </div>
 
-        <div className="flex justify-between font-bold border-b">
+        <div className="flex justify-between font-bold border-b p-2">
           <p>Total Questions</p>
           <p>{totalQuestions}</p>
         </div>
-        <div className="flex justify-between font-bold border-b">
+        <div className="flex justify-between font-bold border-b p-2">
           <p>Correct Questions</p>
           <p>{correctAns}</p>
         </div>

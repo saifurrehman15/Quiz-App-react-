@@ -5,7 +5,7 @@ function KeyEnterPage() {
   const { nameQuiz, courseName, key, time, id } = useParams();
   const [keyCheck, setCheck] = useState("");
   return (
-    <div className="pt-20 h-screen">
+    <div>
       <h3 className="text-white text-sm font-bold  sm:text-2xl">
         {nameQuiz} ({courseName})
       </h3>
