@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { GoogleOutlined } from "@ant-design/icons";
 import ParticleCanvas from "../component/particles";
-
+import image from "../src/assets/image 1.png";
 function SignInForm() {
   const navigate = useNavigate();
 
@@ -52,7 +52,9 @@ function SignInForm() {
           <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4 items-center small-device">
             <div className="flex items-center px-4 sm:px-10">
               <div>
-                <h2 className="mb-4 font-bold text-2xl sm:text-3xl">Welcome to QuizMaster!</h2>
+                <h2 className="mb-4 font-bold text-2xl sm:text-3xl">
+                  Welcome to QuizMaster!
+                </h2>
                 <p className="mb-4">
                   Challenge yourself with our interactive quiz app! Learn,
                   improve, and track your progress with every question. Perfect
@@ -71,7 +73,7 @@ function SignInForm() {
             <div className="flex justify-center items-center px-4 sm:px-10">
               <div className="image">
                 <img
-                  src="../src/assets/images.jpeg"
+                  src={image}
                   alt="QuizMaster Logo"
                   className="img-fluid rounded-lg w-[80%] h-auto md:w-[60%] lg:w-[70%] object-contain"
                 />
