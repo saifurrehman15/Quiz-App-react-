@@ -21,6 +21,7 @@ function RoutesProviderFunc() {
   const { isLogin } = user;
   const logged = JSON.parse(sessionStorage.getItem("logged"));
   console.log(logged);
+  const cheated = JSON.parse(localStorage.getItem("ifCheat")) || [];
 
   return (
     <Routes>

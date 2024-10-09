@@ -146,8 +146,8 @@ const LayoutFunc = () => {
           />
           <div className="flex items-center">
             <img
-              src={image || "default-image-url"} // Fallback image
-              alt={userDetails?.userName || "User"}
+              src={image} // Fallback image
+              alt={userDetails?.userName}
               height={40}
               width={40}
               className="rounded-full border border-gray-500 shadow-sm" // Dark border
