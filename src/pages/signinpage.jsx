@@ -1,14 +1,37 @@
-import React from "react";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import React, { useState } from "react";
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth, provider, db } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { GoogleOutlined } from "@ant-design/icons";
+import { GoogleOutlined, UserOutlined } from "@ant-design/icons";
 import ParticleCanvas from "../component/particles";
 import image from "../assets/images.jpeg";
+import { Button, Form, Input, Modal, Spin } from "antd";
+
 function SignInForm() {
   const navigate = useNavigate();
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [form] = Form.useForm(); // Bind form instance
 
+  const adminSignUp = ({ email, password }) => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log("Admin signed in:", user);
+        navigate(`/`); 
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Error signing in as admin:", errorCode, errorMessage);
+      });
+  };
+
+  // Function to handle Google sign-up
   const signUp = () => {
     signInWithPopup(auth, provider)
       .then(async (result) => {
@@ -26,8 +49,7 @@ function SignInForm() {
               result: [],
             });
           }
-          // Continue with the navigation or any other logic
-          navigate(`/`);
+          navigate(`/`); // Redirect after sign-in
           console.log(user);
         } catch (error) {
           console.error("Error checking/creating user document: ", error);
@@ -37,8 +59,16 @@ function SignInForm() {
         const errorCode = error.code;
         const errorMessage = error.message;
         const credential = GoogleAuthProvider.credentialFromError(error);
-        console.error("Sign-in error: ", errorCode, errorMessage, credential);
+        console.error("Sign-in error:", errorCode, errorMessage, credential);
       });
+  };
+
+  // Modal control
+  const showModal2 = () => {
+    setIsModalOpen2(true);
+  };
+  const handleCancel2 = () => {
+    setIsModalOpen2(false);
   };
 
   return (
@@ -46,13 +76,57 @@ function SignInForm() {
       {/* Particle Effect */}
       <ParticleCanvas />
 
+      {/* Admin Signup Modal */}
+      <Modal
+        title={<h1 className="font-bold text-blue-400">QuizAce</h1>}
+        open={isModalOpen2}
+        onCancel={handleCancel2}
+        footer={
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={handleCancel2}
+              className="border border-blue-400 p-1 rounded px-8"
+            >
+              Cancel
+            </button>
+            <button
+              form="courses_form"
+              key="submit"
+              type="submit"
+              className="bg-blue-500 text-white p-1 px-8 rounded"
+            >
+              Signup
+            </button>
+          </div>
+        }
+      >
+        <Form
+          form={form} // Bind form instance
+          name="courses_form"
+          onFinish={adminSignUp} // Pass form values to the adminSignUp function
+        >
+          <Form.Item
+            name="email"
+            rules={[{ required: true, message: "Please enter your email!" }]}
+          >
+            <Input placeholder="Enter your email" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: "Please enter your password!" }]}
+          >
+            <Input type="password" placeholder="Enter your password" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {/* Hero Section */}
       <section className="hero-section relative z-10">
         <div className="container mx-auto sect">
           <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-4 items-center small-device">
             <div className="flex items-center px-4 sm:px-10">
               <div>
-                <h2 className="mb-4 font-bold text-2xl sm:text-3xl">
+                <h2 className="mb-4 font-bold text-2xl sm:text-3xl information">
                   Welcome to QuizMaster!
                 </h2>
                 <p className="mb-4">
@@ -62,11 +136,18 @@ function SignInForm() {
                   full potential!
                 </p>
                 <button
-                  className=" bg-blue-500 p-3 px-4 mt-2 text-white rounded-full transition-all duration-300 hover:bg-blue-700 hover:scale-105 shadow-xl hover:shadow-2xl"
+                  className="bg-blue-500 p-3 sm:w-[40%] px-4 mt-1 text-white rounded-full transition-all duration-300 hover:bg-blue-700 hover:scale-105 shadow-xl hover:shadow-2xl"
                   onClick={signUp}
                 >
                   <GoogleOutlined className="google mx-2 bg-danger" />
                   Sign up with Google
+                </button>
+                <button
+                  className="bg-blue-500 p-3 px-4 mt-2 sm:w-[40%] ms-2 text-white rounded-full transition-all duration-300 hover:bg-blue-700 hover:scale-105 shadow-xl hover:shadow-2xl"
+                  onClick={showModal2}
+                >
+                  <UserOutlined className="google mx-2 bg-danger" />
+                  Sign up as Admin
                 </button>
               </div>
             </div>
@@ -101,7 +182,8 @@ function SignInForm() {
               values="
                 M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z;
                 M321.39,50.44c58-5.79,114.16-15.13,172-26.86,82.39-6.72,168.19-7.73,250.45,.39C823.78,21,906.67,62,985.66,82.83c70.05,10.48,146.53,18.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,50.44Z;
-                M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+                M321.39,60.44c58-20.79,114.16-35.13,172-50.86,82.39-26.72,168.19-27.73,250.45-.39C823.78,41,906.67,82,985.66,102.83c70.05,28.48,146.53,36.09,214.34,13V0H0V27.35A600.21,600.21,0,0,0,321.39,60.44Z;
+              "
             />
           </path>
         </svg>

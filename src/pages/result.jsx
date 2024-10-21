@@ -56,7 +56,7 @@ function ResultPage() {
                 <tr key={ind} className="hover:bg-gray-600 text-center">
                   <td className="border-b border-gray-300 px-4 py-2 text-white">{ind + 1}</td>
                   <td className="border-b border-gray-300 px-4 py-2 text-white">
-                    {result.date ? result.date.toDate().toLocaleDateString() : "N/A"}
+                    {result.date ? result.date.toDate().toDateString() : "N/A"}
                   </td>
                   <td className="border-b border-gray-300 px-4 py-2 text-white">{result.course || "N/A"}</td>
                   <td className="border-b border-gray-300 px-4 py-2 text-white">{result.subject || "N/A"}</td>

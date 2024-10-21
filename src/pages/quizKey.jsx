@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { message } from "antd";
 function KeyEnterPage() {
-  const { nameQuiz, courseName, key, time, id } = useParams();
+  const { nameQuiz, courseName, key, time, id, active } = useParams();
   const [keyCheck, setCheck] = useState("");
+  const activeVal = active === "true";
+  console.log(activeVal);
+
   return (
     <div>
       <h3 className="text-white text-sm font-bold  sm:text-2xl">
@@ -26,21 +29,25 @@ function KeyEnterPage() {
         {keyCheck !== "" ? (
           <Link
             to={
-              keyCheck === key
-                ? `/quizpage/${nameQuiz}/${courseName}/${time}/${id}`
+              keyCheck === key && activeVal
+                ? `/test/quizpage/${nameQuiz}/${courseName}/${time}/${id}`
                 : "#"
             }
             className="bg-blue-600 text-white p-2 px-5 float-end no-underline"
-            onClick={() =>
-              keyCheck !== key
-                ? message.error("Invalid key,Please enter correct key!")
-                : ""
-            }
+            onClick={() => {
+              if (activeVal) {
+                if (keyCheck !== key) {
+                  message.error("Invalid key,Please enter correct key!");
+                }
+              } else {
+                message.error("This quiz is not added!");
+              }
+            }}
           >
             Start Exam
           </Link>
         ) : (
-          <span className="bg-blue-600  text-white p-2 px-5 float-end  opacity-50">
+          <span className="bg-blue-600 cursor-pointer text-white p-2 px-5 float-end  opacity-50">
             Start Exam
           </span>
         )}

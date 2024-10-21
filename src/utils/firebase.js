@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
-import { setDoc, getDoc, getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
+import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,7 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
+const storage = getStorage(app);
 // Initialize Firestore
 const db = getFirestore(app);
 
@@ -28,4 +29,4 @@ if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
 }
 
-export { auth, provider, onAuthStateChanged, db };
+export { auth, provider, onAuthStateChanged, db, storage };

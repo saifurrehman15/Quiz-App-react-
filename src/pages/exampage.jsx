@@ -1,20 +1,26 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   arrayUnion,
   collection,
-  doc,
-  getDocs,
   updateDoc,
+  getDocs,
+  setDoc,
+  doc,
 } from "firebase/firestore";
-import { db } from "../utils/firebase"; // Import your Firestore instance
-import { message, Modal } from "antd";
-
+import { db } from "../utils/firebase";
+import { message, Modal, Spin } from "antd";
+import sound from "../assets/clock-ticking-sound-effect-240503.mp3";
+import { set } from "react-hook-form";
+import { userContext } from "../context/userContext";
 function QuizPage() {
   const { quizSelected, id, courseName, time } = useParams();
+  const { users } = useContext(userContext);
+  const { displayName } = users;
   const quizTime = Number(time.split(" ")[0]);
+  console.log(displayName);
 
-  const [timer, setTimer] = useState(quizTime);
+  const [timer, setTimer] = useState(20);
   const [optionsSelected, setOptionsSelected] = useState(false);
   const [btnText, setBtnText] = useState("Next");
   const [isLastQuestion, setIsLastQuestion] = useState(false);
@@ -29,23 +35,42 @@ function QuizPage() {
   const [disabledOpt, setDisOpt] = useState(false);
   const totalQuestions = data.length;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const cheated = JSON.parse(localStorage.getItem("ifCheat")) || [];
-  const [isOffline, setIsOffline] = useState(false); // State for tracking offline status
-
+  const cheated = JSON.parse(localStorage.getItem("ifCheat")) || {};
+  const [isOffline, setIsOffline] = useState(false);
+  const [answerChecking, setChecking] = useState(false);
   useEffect(() => {
     getData();
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Event listeners for online/offline detection
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
   }, [quizSelected]);
+
+  const reason = async (reasonDetect) => {
+    if (submitRes) return;
+
+    const currentCheatData = JSON.parse(localStorage.getItem("ifCheat")) || {};
+    const reasons = currentCheatData.reasons || [];
+
+    if (!isLastQuestion && !isOffline) {
+      reasons.push(reasonDetect);
+      const userDocRef = doc(db, "cheatDetector", id);
+      message.error("Cheating detected! You are not allowed to take the test.");
+
+      await setDoc(userDocRef, {
+        cheat: true,
+        timeSuspend: new Date(),
+        reasons: reasons,
+        id,
+        displayName,
+      });
+      window.location.replace("/")
+    }
+  };
 
   useEffect(() => {
     if (count === data.length - 1) {
@@ -58,30 +83,38 @@ function QuizPage() {
     enterFullScreen();
 
     const onFullScreenChange = () => {
-      if (!document.fullscreenElement) {
-        localStorage.setItem(
-          "ifCheat",
-          JSON.stringify({ cheat: true, timeSuspend: new Date() })
-        );
-        window.location.replace("/");
+      if (!document.fullscreenElement && !isLastQuestion) {
+        reason("Press Escape");
       }
     };
 
+    const onCopy = (e) => {
+      e.preventDefault();
+      reason("Copy text");
+    };
+
+    const onKeyPress = () => {
+      reason("Press Key");
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        reason("Change Tab");
+      }
+    };
+
+    document.addEventListener("copy", onCopy);
+    window.addEventListener("keypress", onKeyPress);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("fullscreenchange", onFullScreenChange);
+
     return () => {
+      document.removeEventListener("copy", onCopy);
+      window.removeEventListener("keypress", onKeyPress);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("fullscreenchange", onFullScreenChange);
     };
-  }, []);
-
-  const handleVisibilityChange = () => {
-    if (document.hidden) {
-      localStorage.setItem(
-        "ifCheat",
-        JSON.stringify({ cheat: true, timeSuspend: new Date() })
-      );
-      window.location.replace("/");
-    }
-  };
+  }, [data, count, isOffline]);
 
   const enterFullScreen = () => {
     const elem = document.documentElement;
@@ -90,24 +123,34 @@ function QuizPage() {
     }
   };
 
-  // Handle user going offline
   const handleOffline = () => {
     setIsOffline(true);
     message.error("You are offline. Please reconnect to continue the quiz.");
   };
 
-  // Handle user coming back online
   const handleOnline = () => {
     setIsOffline(false);
     message.success("You are back online.");
   };
 
-  // Prevent cheating by reloading or navigating away
-  window.onload = () => {
-    localStorage.setItem(
-      "ifCheat",
-      JSON.stringify({ cheat: true, timeSuspend: new Date() })
-    );
+  useEffect(() => {
+    let interval;
+    if (timer > 0 && !answerChecking) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (!answerChecking) {
+      handleTimeOut();
+    }
+
+    return () => clearInterval(interval);
+  }, [timer, answerChecking]);
+
+  const handleTimeOut = () => {
+    message.error("Time's up! Moving to the next question.");
+    answerCheck();
   };
 
   const answerCheck = async () => {
@@ -118,7 +161,7 @@ function QuizPage() {
 
     let updatedScore = score;
 
-    if (data[count]?.quiz.answer === checked) {
+    if (data[count]?.quiz.answer === checked && timer > 0) {
       updatedScore += 1;
       setScore(updatedScore);
     }
@@ -128,6 +171,7 @@ function QuizPage() {
     if (count < data.length - 1) {
       setCount(count + 1);
       setChecked("");
+      setTimer(20);
       setDisOpt(false);
       setColor("");
     } else {
@@ -138,16 +182,26 @@ function QuizPage() {
         scores: (updatedScore * 100) / totalQuestions,
       };
 
+      setIsLastQuestion(true);
       setRes(true);
-      const userDocRef = doc(db, "users", id);
-      await updateDoc(userDocRef, {
-        result: arrayUnion(resultObj),
-      });
-      setRes(false);
 
-      window.location.replace(
-        `/quickresult/${quizSelected}/${courseName}/${data.length}/2/${updatedScore}/${id}`
-      );
+      try {
+        const userDocRef = doc(db, "users", id);
+        await updateDoc(userDocRef, {
+          result: arrayUnion(resultObj),
+        });
+
+        setTimeout(() => {
+          window.location.replace(
+            `/quickresult/${quizSelected}/${courseName}/${data.length}/${updatedScore}/${id}`
+          );
+        }, 1000);
+      } catch (error) {
+        message.error("Failed to submit your result. Please try again.");
+        console.error("Error updating document: ", error);
+      } finally {
+        setRes(false);
+      }
     }
   };
 
@@ -157,40 +211,42 @@ function QuizPage() {
   };
 
   const showModal = () => {
+    setChecking(true);
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
+    setChecking(false);
     setIsModalOpen(false);
   };
 
   const handleCancel = () => {
+    setChecking(false);
     setIsModalOpen(false);
   };
 
   const getData = async () => {
     setLoading(true);
     try {
-      if (cheated.cheat) {
+      if (cheated.cheat && !isLastQuestion) {
         message.error(
           "Cheating detected! You are not allowed to take the test."
         );
-        setTimeout(() => {
-          window.location.replace("/");
-        }, 1500);
+        window.location.replace("/");
       }
 
-     if (!cheated.cheat) {
-      const q = collection(db, quizSelected);
-      const querySnapshot = await getDocs(q);
-      const docsArray = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        quiz: doc.data(),
-      }));
-      setData(docsArray);
-     }
+      if (!cheated.cheat) {
+        const q = collection(db, quizSelected);
+        const querySnapshot = await getDocs(q);
+        const docsArray = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          quiz: doc.data(),
+        }));
+        setData(docsArray);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
+      message.error("Error fetching quiz data. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -204,38 +260,48 @@ function QuizPage() {
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
+          centered
         >
-          <p>{data[count]?.quiz?.description}</p>
+          <p>{data[count]?.quiz?.description || "No Explanation Available"}</p>
         </Modal>
       )}
 
       {loading ? (
-        <p className="text-xl">Loading...</p>
+        <Spin tip="Loading..." className="mt-10" />
       ) : isOffline ? (
         <p className="text-xl text-red-500">
           You are offline. Please reconnect to continue.
         </p>
       ) : (
-        <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">{`Question ${
+        <div className="w-[90%] max-w-lg mt-10  mx-10 bg-gray-900 text-white py-8 px-4 rounded-lg shadow-sm shadow-gray-300">
+          <h2 className="text-3xl  font-semibold mb-5 font-mono text-center">{`Question ${
             count + 1
           }/${totalQuestions}`}</h2>
           <div className="flex justify-between">
-            <p className="mb-4 text-lg">{data[count]?.quiz.question}</p>
-            {optColor === "bg-red-400" && (
-              <button
-                className="bg-blue-500 px-4 h-8 text-white"
-                onClick={showModal}
-              >
-                Answer
-              </button>
-            )}
+            <p className="mb-6 text-lg font-bold">
+              {count + 1 + ") " + data[count]?.quiz.question}
+            </p>
+
+            <div className="flex gap-2">
+              {optColor === "bg-red-400" && (
+                <button
+                  className="bg-blue-500 px-4 h-8 text-white rounded-md"
+                  onClick={showModal}
+                  aria-label="Show answer explanation"
+                >
+                  Answer
+                </button>
+              )}
+              <span
+                className={`text-xl ${timer < 10 && "text-red-500"}`}
+              >{`Timer: ${timer}s`}</span>
+            </div>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {data[count]?.quiz.options.map((elem, ind) => (
               <label
                 htmlFor={`option${ind}`}
-                className={`flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-gray-800 ${
+                className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-gray-800 ${
                   `option${ind}` === optTrigger ? optColor : ""
                 }`}
                 key={ind}
@@ -255,22 +321,25 @@ function QuizPage() {
                     setTrigger(e.target.id);
                     answerDetect(e.target.value);
                   }}
+                  aria-label={`Option ${ind + 1}: ${elem}`}
                 />
-                {elem}
+                <span>{elem}</span>
               </label>
             ))}
           </div>
-          <button
-            className={`mt-4 p-2 px-8 float-end rounded-md ${
-              optionsSelected
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-gray-300"
-            } text-white`}
-            disabled={!optionsSelected}
-            onClick={answerCheck}
-          >
-            {btnText}
-          </button>
+
+          <div className="flex justify-end mt-4">
+            <button
+              className={`bg-blue-500 px-4 h-10 text-white rounded-md float-end ${
+                !optionsSelected ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              onClick={answerCheck}
+              disabled={!optionsSelected}
+              aria-label="Submit answer"
+            >
+              {btnText}
+            </button>
+          </div>
         </div>
       )}
     </div>

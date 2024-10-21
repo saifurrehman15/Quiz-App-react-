@@ -15,6 +15,12 @@ import KeyEnterPage from "../pages/quizKey";
 import QuizPage from "../pages/exampage";
 import ResultPage from "../pages/result";
 import QuickResult from "../pages/quickresultpage";
+import AdminLayoutFunc from "../component/adminLayout";
+import ManageQuizApp from "../pages/manageQuiz";
+import CourseManage from "../pages/courses";
+import AddSubject from "../pages/subjectsAdd";
+import CheatingReport from "../pages/report";
+// import AdminPage from "../pages/adminPage";
 
 function RoutesProviderFunc() {
   const user = useContext(userContext); // Fetching user state from context
@@ -44,20 +50,30 @@ function RoutesProviderFunc() {
         <Route index element={<App />} />
         <Route path="/subject/:course/:id" element={<SubjectSelect />} />
         <Route
-          path="/quiz/:nameQuiz/:key/:courseName/:time/:id"
+          path="/quiz/:nameQuiz/:key/:courseName/:time/:id/:active"
           element={<KeyEnterPage />}
         />
-        <Route
-          path="/quizpage/:quizSelected/:courseName/:time/:id"
-          element={<QuizPage />}
-        />
+
         <Route path="/result/:id" element={<ResultPage />} />
         <Route
-          path="/quickresult/:nameQuiz/:courseName/:totalQuestions/:correctAns/:score/:id"
+          path="/quickresult/:nameQuiz/:courseName/:totalQuestions/:score/:id"
           element={<QuickResult />}
         />
+        <Route path="*" element={"saif"} />
       </Route>
       {/* /result/:nameQuiz/:courseName/:totalQuestions/:correctAns/:id */}
+      <Route path="test" element={<Outlet />}>
+        <Route
+          path="quizpage/:quizSelected/:courseName/:time/:id"
+          element={<QuizPage />}
+        />
+      </Route>
+      <Route path="admin" element={<AdminLayoutFunc />}>
+        <Route path="managequiz" element={<ManageQuizApp />} />
+        <Route path="courses" element={<CourseManage />} />
+        <Route path="addsubject" element={<AddSubject />} />
+        <Route path="report" element={<CheatingReport />} />
+      </Route>
     </Routes>
   );
 }
