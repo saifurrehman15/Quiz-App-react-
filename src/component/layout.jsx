@@ -87,6 +87,7 @@ const LayoutFunc = () => {
                   icon: <BarChartOutlined />,
                   label: <Link to={`/result/${id}`}>Result</Link>,
                 },
+                manage,
                 {
                   key: "3",
                   icon: <LogoutOutlined />,
