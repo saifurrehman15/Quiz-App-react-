@@ -165,7 +165,7 @@ function SignInForm() {
                   onClick={showModal2}
                 >
                   <UserOutlined className="google mx-2 bg-danger" />
-                  Sign up as Admin
+                  Sign in as Admin
                 </button>
               </div>
             </div>

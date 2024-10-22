@@ -300,7 +300,7 @@ function SubjectSelect() {
             </>
           ) : (
             <h1 className="text-red-500 text-2xl text-center">
-              Oops! Data not found
+              No Subjects available
             </h1>
           )}
         </div>
