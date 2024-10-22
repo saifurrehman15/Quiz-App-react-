@@ -19,7 +19,7 @@ function SignInForm() {
 
   const adminSignUp = ({ email, password }) => {
     signInWithEmailAndPassword(auth, email, password)
-      .then(async(userCredential) => {
+      .then(async (userCredential) => {
         try {
           const user = userCredential.user;
 
@@ -36,10 +36,7 @@ function SignInForm() {
             console.log("Admin signed in:", user);
             navigate(`/`);
           }
-        } catch (error) {
-          
-        }
-        
+        } catch (error) {}
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -95,7 +92,7 @@ function SignInForm() {
 
       {/* Admin Signup Modal */}
       <Modal
-        title={<h1 className="font-bold text-blue-400">QuizAce</h1>}
+        title={<h1 className="font-bold text-blue-400">Admin Login</h1>}
         open={isModalOpen2}
         onCancel={handleCancel2}
         footer={
@@ -126,13 +123,17 @@ function SignInForm() {
             name="email"
             rules={[{ required: true, message: "Please enter your email!" }]}
           >
-            <Input placeholder="Enter your email" />
+            <Input
+              placeholder="Enter your email"
+              className="border border-blue-300"
+            />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, message: "Please enter your password!" }]}
           >
-            <Input type="password" placeholder="Enter your password" />
+            <Input type="password" placeholder="Enter your password"               className="border border-blue-300"
+ />
           </Form.Item>
         </Form>
       </Modal>
