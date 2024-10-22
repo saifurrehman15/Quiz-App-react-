@@ -68,7 +68,7 @@ function QuizPage() {
         id,
         displayName,
       });
-      window.location.replace("/")
+      window.location.replace("/");
     }
   };
 

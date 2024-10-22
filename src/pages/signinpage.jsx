@@ -19,10 +19,27 @@ function SignInForm() {
 
   const adminSignUp = ({ email, password }) => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log("Admin signed in:", user);
-        navigate(`/`); 
+      .then(async(userCredential) => {
+        try {
+          const user = userCredential.user;
+
+          const userDocRef = doc(db, "users", user.uid);
+
+          const userDoc = await getDoc(userDocRef);
+          if (!userDoc.exists()) {
+            await setDoc(userDocRef, {
+              email: user.email,
+              userName: user.displayName,
+              id: user.uid,
+              result: [],
+            });
+            console.log("Admin signed in:", user);
+            navigate(`/`);
+          }
+        } catch (error) {
+          
+        }
+        
       })
       .catch((error) => {
         const errorCode = error.code;
