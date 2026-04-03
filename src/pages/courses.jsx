@@ -20,21 +20,20 @@ function CourseManage() {
       if (!existOrNot) {
         // Retrieve the file from the form values
         setLoader(true);
-        const iconFile = values.icon[0].originFileObj;
+        // const iconFile = values.icon[0].originFileObj;
 
         // Upload the file to Firebase Storage
-        const iconRef = ref(
-          storage,
-          `images/${values.course}/${iconFile.name}`
-        );
-        await uploadBytes(iconRef, iconFile);
+        // const iconRef = ref(
+        //   storage,
+        //   `images/${values.course}/${iconFile.name}`
+        // );
+        // await uploadBytes(iconRef, iconFile);
 
         // Get the download URL of the uploaded file
-        const url = await getDownloadURL(iconRef);
+        // const url = await getDownloadURL(iconRef);
         const obj = {
           ...values,
           active: values.active === undefined ? false : values.active,
-          icon: url, // Use the uploaded file URL
         };
 
         // Firestore submission
