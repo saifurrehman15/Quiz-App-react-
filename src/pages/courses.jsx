@@ -31,10 +31,10 @@ function CourseManage() {
 
         // Get the download URL of the uploaded file
         // const url = await getDownloadURL(iconRef);
-        const obj = {
-          ...values,
-          active: values.active === undefined ? false : values.active,
-        };
+       const obj = {
+  course: values.course,
+  active: values.active ?? false,
+};
 
         // Firestore submission
         const docRef = collection(db, "courses");
