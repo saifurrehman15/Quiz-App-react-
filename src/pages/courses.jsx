@@ -96,7 +96,6 @@ function CourseManage() {
         className="w-full"
         valuePropName="fileList"
         getValueFromEvent={normFile}
-        rules={[{ required: true, message: "Please upload an icon!" }]}
       >
         <Upload beforeUpload={() => false} maxCount={1}>
           <Button>Click to Upload Icon</Button>
